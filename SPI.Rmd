@@ -1,0 +1,66 @@
+---
+title: "Standardized Precipitation Index (SPI) Analysis"
+author: "Freedom K Muranda"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+# Executive Summary
+
+This report presents an analysis of the Standardized Precipitation Index (SPI) using monthly precipitation data. The SPI is a widely used drought index that quantifies precipitation deficits or surpluses over a specified time scale. In this analysis, we calculate the SPI for a 3-month time scale and visualize the results, highlighting negative (drought) values in red and positive (wet) values in blue. The findings provide insights into drought conditions and can inform water resource management decisions.
+
+# Methodology
+
+## Data
+
+The analysis uses monthly precipitation data (in millimeters) for a hypothetical location over a 5-year period. The data is stored in a vector and represents 60 months of precipitation.
+
+## SPI Calculation
+
+The SPI is calculated using the `SPEI` package in R. The steps include: 1. Loading the `SPEI` package. 2. Preparing the precipitation data. 3. Calculating the SPI for a 3-month time scale using the `spi()` function. 4. Visualizing the SPI values, with negative values in red and positive values in blue.
+
+## Tools
+
+-   R programming language
+-   `SPEI` package for SPI calculation
+-   Base R for plotting
+
+# Results
+
+## Code Implementation
+
+Below is the R code used to calculate and plot the SPI:
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# Load the SPEI package
+library(SPEI)
+
+# Example precipitation data (60 months of data)
+precipitation <- c(120, 90, 80, 60, 50, 40, 30, 20, 10, 15, 25, 35,
+                   110, 85, 75, 55, 45, 35, 25, 15, 10, 20, 30, 40,
+                   100, 80, 70, 50, 40, 30, 20, 10, 5, 15, 25, 35,
+                   95, 75, 65, 45, 35, 25, 15, 5, 10, 20, 30, 40,
+                   105, 85, 75, 55, 45, 35, 25, 15, 10, 20, 30, 40)
+
+# Calculate SPI for a 3-month time scale
+spi_result <- spi(precipitation, scale = 3)
+
+# Extract SPI values
+spi_values <- spi_result$fitted
+
+# Handle NA values (initial months due to rolling window)
+spi_values <- na.omit(spi_values)
+
+# Create a color vector based on SPI values
+colors <- ifelse(spi_values < 0, "red", "blue")
+
+# Plot SPI values with custom colors
+plot(spi_values, type = "h", col = colors, lwd = 2,
+     main = "SPI (3-month scale)", ylab = "SPI", xlab = "Time")
+
+# Add a horizontal line at 0 for reference
+abline(h = 0, col = "black", lty = 2)
+```

@@ -1,0 +1,60 @@
+---
+title: "Zimbabwe AEZs Map"
+author: "Freedom K Muranda"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+\`\`\`{r setup, include=FALSE} \# Global settings for R Markdown knitr::opts_chunk\$set(echo = TRUE, fig.width = 10, fig.height = 7)
+
+# Install and load necessary libraries
+
+if (!requireNamespace("sf", quietly = TRUE)) install.packages("sf") if (!requireNamespace("leaflet", quietly = TRUE)) install.packages("leaflet") if (!requireNamespace("RColorBrewer", quietly = TRUE)) install.packages("RColorBrewer")
+
+library(sf) \# For spatial data handling library(leaflet) \# For map visualization library(RColorBrewer) \# For color palettes
+
+```{r}
+# Set the path to the Zimbabwe AEZ shapefile
+shapefile_path <- "/Volumes/USB DISK/Research Project 2024/New_regions/Zim_regions.shp"
+
+# Confirm the file exists
+if (!file.exists(shapefile_path)) {
+  stop("Shapefile not found. Check the path and ensure all shapefile components are present.")
+}
+
+# Import the shapefile
+zimbabwe_aezs <- st_read(shapefile_path)
+
+# Validate and fix geometries, if needed
+if (!all(st_is_valid(zimbabwe_aezs))) {
+  zimbabwe_aezs <- st_make_valid(zimbabwe_aezs)
+}
+
+# Inspect the first few rows of the dataset
+head(zimbabwe_aezs)
+
+```
+
+```{r}
+# Define a more distinct color palette using RColorBrewer (e.g., "Paired")
+color_palette <- colorFactor(palette = RColorBrewer::brewer.pal(8, "Paired"), domain = zimbabwe_aezs$Regions)
+
+# Create a leaflet map to display Zimbabwe AEZs with rich colors and no labels
+leaflet(data = zimbabwe_aezs) %>%
+  addPolygons(
+    fillColor = ~color_palette(Regions),  # Color palette for AEZ regions
+    color = "black",                      # Black borders for polygons
+    weight = 1,                           # Border weight
+    opacity = 0.7,                        # Polygon opacity
+    fillOpacity = 0.7,                    # Fill opacity
+    popup = ~paste("Region:", Regions)    # Popup showing the region name
+  ) %>%
+  addLegend(
+    position = "topright", 
+    pal = color_palette,  # Color palette for AEZ regions
+    values = zimbabwe_aezs$Regions, 
+    title = "AEZ Regions",
+    opacity = 1
+  )  # Add the legend to the map
+```
